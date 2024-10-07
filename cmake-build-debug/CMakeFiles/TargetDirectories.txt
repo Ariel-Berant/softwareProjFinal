@@ -1,0 +1,3 @@
+C:/Users/ariel/CLionProjects/softwareProjFinal/cmake-build-debug/CMakeFiles/softwareProjFinal.dir
+C:/Users/ariel/CLionProjects/softwareProjFinal/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/ariel/CLionProjects/softwareProjFinal/cmake-build-debug/CMakeFiles/rebuild_cache.dir
