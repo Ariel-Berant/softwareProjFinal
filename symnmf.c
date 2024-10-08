@@ -211,6 +211,182 @@ void multDDGR(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from rig
     }
 }
 
+mat *copyMat(mat *m){/*copy matrix*/
+    int i, j;
+    mat *res = initMatrix(m->rows, m->cols);
+    if(res == NULL){
+        return NULL;
+    }
+
+    for(i = 0; i < m->rows; i++){
+        for(j = 0; j < m->cols; j++){
+            res->data[i][j] = m->data[i][j];/*copy cell*/
+        }
+    }
+
+    return res;
+}
+
+mat *calcTranspose(mat *m){/*calculate transpose of matrix*/
+    int i, j;
+    mat *res = initMatrix(m->cols, m->rows);
+    if(res == NULL){
+        return NULL;
+    }
+
+    for(i = 0; i < m->rows; i++){
+        for(j = 0; j < m->cols; j++){
+            res->data[j][i] = m->data[i][j];/*transpose cell, (A^T)_i,j = A_j,i*/
+        }
+    }
+
+    return res;
+}
+
+double multRowByCol(mat *mat1, mat *mat2, int row, int col){
+    double res = 0;
+    int i;
+
+    for(i = 0; i < mat1->cols; i++){
+        res += mat1->data[row][i] * mat2->data[i][col];/*calculate sum of a_i,j*b_j,i for A, B matrices*/
+    }
+
+    return res;
+}
+
+double calcFrobNormSq(mat *h, mat *nextH){/*calculate Frobenius norm of matrix*/
+    int i, j;
+    double sum = 0;
+
+    for(i = 0; i < h->rows; i++){
+        for(j = 0; j < h->cols; j++){
+            sum += pow((h->data[i][j] - nextH->data[i][j]), 2);/*sum of all cells squared*/
+        }
+    }
+
+    return sum;
+}
+
+mat *multMat(mat *mat1, mat *mat2){
+    int i, j;
+    mat *res = initMatrix(mat1->rows, mat2->cols);/*init result matrix*/
+    if(res == NULL){
+        return NULL;
+    }
+
+    for(i = 0; i < mat1->rows; i++){
+        for(j = 0; j < mat2->cols; j++){
+            res->data[i][j] = multRowByCol(mat1, mat2, i, j);/*C_i,j = A_i*B_j*/
+        }
+    }
+
+    return res;
+}
+
+mat *calcAbomination(mat *m){/*calculate abomination of matrix(i.e (A*A^T)*A)*/
+    mat *first = multMat(m, calcTranspose(m));/*A*A^T*/
+    if(first == NULL){
+        return NULL;
+    }
+
+    mat *res = multMat(first, m);/*(A*A^T)*A*/
+    if(res == NULL){
+        freeMatrix(first);
+        return NULL;
+    }
+
+    return res;
+}
+
+mat *calcNextIter(mat *numerator, mat *denominator, mat *h) {/*calculate next iteration of H*/
+    int i, j;
+    double res;
+
+    mat *nextH;
+    nextH = initMatrix(h->rows, h->cols);
+    if(nextH == NULL){
+        return NULL;
+    }
+
+    for (i = 0; i < nextH->rows; ++i) {
+        for (j = 0; j < nextH->cols; ++j) {
+            res = numerator->data[i][j] / denominator->data[i][j];/*calculate numerator/denominator*/
+            res = (1 - BETA) + (BETA * res);/*calculate BETA*res + (1-BETA)*/
+            nextH->data[i][j] = h->data[i][j] * res;/*calculate next H_i,j*/
+        }
+    }
+
+    return nextH;
+}
+
+int checkFinish(mat *h, mat *nextH, int currIter){/*check if H has converged*/
+    int i, j;
+    double diff;
+
+    if(calcFrobNormSq(h, nextH) < EPSILON){/*if Frobenius norm is less than EPSILON, converged*/
+        return 1;
+    }
+    if(currIter >= MAX_ITER){/*if reached MAX_ITER, not converged*/
+        return 1;
+    }
+
+    return 0;
+}
+
+void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices*/
+    if(numer != NULL){
+        freeMatrix(numer);
+    }
+    if(denom != NULL){
+        freeMatrix(denom);
+    }
+    if(currH != NULL){
+        freeMatrix(currH);
+    }
+    if(nextH != NULL){
+        freeMatrix(nextH);
+    }
+}
+
+mat *calcSymnmf(mat *h, mat *w){/*calculate symnmf matrix*/
+    int iter = 0;
+    mat *numer, *denom, *currH, *nextH;
+    nextH = copyMat(h);/*copy H matrix*/
+    if(nextH == NULL){
+        return NULL;
+    }
+
+    do {
+        if(iter != 0){
+            freeMatrix(currH);/*free previous H*/
+        }
+        currH = nextH;
+        numer = multMat(w, currH);/*calculate numerator*/
+        if(numer == NULL){
+            freeAll(numer, denom, currH, nextH);
+            return NULL;
+        }
+
+        denom = calcAbomination(currH);/*calculate abomination(aka denominator)*/
+        if(denom == NULL){
+            freeAll(numer, denom, currH, nextH);
+            return NULL;
+        }
+
+        nextH = calcNextIter(numer, denom, currH);/*calculate nextH*/
+        if(nextH == NULL){
+            freeAll(numer, denom, currH, nextH);
+            return NULL;
+        }
+        iter++;
+    } while(!checkFinish(currH, nextH, iter));/*check if H has converged*/
+
+    freeMatrix(denom);
+    freeMatrix(numer);
+    freeMatrix(currH);
+    return nextH;
+}
+
 void printMatrix(mat *m){/*print matrix*/
     int i, j;
     for(i = 0; i < m->rows; i++){/*print every column of every row*/
@@ -338,6 +514,12 @@ void norm(char *file_name){/*norm wrap*/
     freeMatrix(m);
 }
 
+
+
+mat *symnmfCalc(mat *m, int k){/*calculate symnmf matrix*/
+    return NULL;
+}
+
 int classifyCalc(char* str){
     if(strcmp(str, "sym") == 0){
         return 1;
@@ -350,8 +532,6 @@ int classifyCalc(char* str){
     }
     return 0;
 }
-
-
 
 int main(int argc, char *argv[]) {
     if(argc != 3){
