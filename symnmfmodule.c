@@ -88,6 +88,11 @@ static PyMethodDef symnmfMethods[] = {
      METH_VARARGS,
      "Calculate the norm matrix"
      },
+    {"symnmf",
+     (PyCFunction)symnmfCalcPy,
+     METH_VARARGS,
+     "Calculate the norm matrix"
+    },
     {NULL, NULL, 0, NULL}
 };
 
