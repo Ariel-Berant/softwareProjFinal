@@ -4,29 +4,6 @@
 
 #include "symnmf.h"
 
-struct matrix
-{
-    double *whole;
-    double **data;
-    int rows;
-    int cols;
-};
-
-struct cord
-{
-    double value;
-    struct cord *next;
-};
-struct vector
-{
-    struct vector *next;
-    struct cord *cords;
-};
-
-typedef struct vector vector;
-typedef struct cord cord;
-typedef struct matrix mat;
-
 void freeCords(cord *crd) {/*frees cords list*/
     if (crd->next != NULL) {
         freeCords(crd->next);
@@ -128,6 +105,7 @@ int getCols(char *file_name){/*get number of columns in file*/
 }
 
 cord *initCords(int cols){/*create new cord list*/
+    int i = 0;
     cord *head = malloc(sizeof(cord)), *curr = head;
 
     if(head == NULL){
@@ -135,7 +113,7 @@ cord *initCords(int cols){/*create new cord list*/
         return NULL;
     }
 
-    for(int i = 0; i < cols - 1; i++){/*create cords for rest of columns*/
+    for(; i < cols - 1; i++){/*create cords for rest of columns*/
         curr->next = malloc(sizeof(cord));
         if(curr->next == NULL){
             freeCords(head);
@@ -211,6 +189,28 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     return headVec;
 }
 
+void multDDGL(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from left*/
+    int i, j;
+    double sum;
+
+    for (i = 0; i < reg->rows; i++) {
+        for (j = 0; j < reg->cols; j++) {
+            reg->data[i][j] *= 1/(sqrt(diag->data[i][i]));/*cell calc, every cell in A is positive*/
+        }
+    }
+}
+
+void multDDGR(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from right*/
+    int i, j;
+    double sum;
+
+    for (i = 0; i < reg->cols; i++) {
+        for (j = 0; j < reg->rows; j++) {
+            reg->data[j][i] *= 1/(sqrt(diag->data[i][i]));/*cell calc, every cell in A is positive*/
+        }
+    }
+}
+
 void printMatrix(mat *m){/*print matrix*/
     int i, j;
     for(i = 0; i < m->rows; i++){/*print every column of every row*/
@@ -229,13 +229,19 @@ double symCellCalc(vector *v1, vector *v2){/*calculate cell in matrix using give
     return val;
 }
 
-mat *symCalc(vector *v, int rows, int cols){/*turn vector mat(n*m) to A(n*n)*/
-    int i = 0, j;
+mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
+    vector *v = createVectors(file_name);/*create vectors from file*/
+    if(v == NULL){
+        return NULL;
+    }
+
+    int i = 0, j, rows = getRows(file_name);
     vector *v1 = v, *v2 = v->next;
     cord *c = NULL;
-    mat *m = initMatrix(rows, rows);/*creates a n*n matrix*/
 
+    mat *m = initMatrix(rows, rows);/*creates a n*n matrix*/
     if(m == NULL){
+        freeData(v);
         return NULL;
     }
 
@@ -250,35 +256,122 @@ mat *symCalc(vector *v, int rows, int cols){/*turn vector mat(n*m) to A(n*n)*/
             v2 = v2->next;
         }
         v1 = v1->next;
+        v2 = v1->next;
     }
 
+    freeData(v);
     return m;
 }
 
 void sym(char *file_name){/*sym wrap*/
-    vector *v = createVectors(file_name);/*create vectors from file*/
-    if(v == NULL){
-        printf("An Error Has Occurred");
-    }
-    mat *m = symCalc(v, getRows(file_name), getCols(file_name));/*create A matrix from vectors*/
+    mat *m = symCalc(file_name);/*create A matrix from vectors*/
     if(m == NULL){
-        freeData(v);
         printf("An Error Has Occurred");
     }
     printMatrix(m);
-    freeData(v);
     freeMatrix(m);
 }
+
+mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
+    int i, j;
+    double sum;
+
+    /*create A matrix from vectors*/
+    mat *m = symCalc(file_name);
+    if(m == NULL){
+        return NULL;
+    }
+
+    mat *d = initMatrix(m->rows, m->cols);/*creates a n*n matrix*/
+    if(d == NULL){
+        return NULL;
+    }
+
+    for(i = 0; i < m->rows; i++){
+        sum = 0;
+        for(j = 0; j < m->cols; j++){/*sums all cells in row*/
+            sum += m->data[i][j];
+        }
+        d->data[i][i] = sum;/*sets diagonal cell to sum*/
+    }
+
+    return d;
+}
+
+void ddg(char *file_name){/*ddg wrap*/
+    /*create D matrix from A matrix*/
+    mat *d = ddgCalc(file_name);
+    if(d == NULL){
+        printf("An Error Has Occurred");
+    }
+    printMatrix(d);
+    freeMatrix(d);
+}
+
+mat *normCalc(char *file_name){/*turns A(n*n) to W(n*n)*/
+    /*create A matrix from vectors*/
+    mat *m = symCalc(file_name);
+    if(m == NULL){
+        return NULL;
+    }
+    /*create D matrix from A*/
+    mat *d = ddgCalc(file_name);
+    if(d == NULL){
+        freeMatrix(m);
+        return NULL;
+    }
+
+    multDDGL(m, d);/*multiply A by D^(-1/2) from left*/
+    multDDGR(m, d);/*multiply A by D^(-1/2) from right*/
+
+    freeMatrix(d);
+    return m;
+}
+
+void norm(char *file_name){/*norm wrap*/
+    /*create W matrix from A matrix*/
+    mat *m = normCalc(file_name);
+    if(m == NULL){
+        printf("An Error Has Occurred");
+    }
+    printMatrix(m);
+    freeMatrix(m);
+}
+
+int classifyCalc(char* str){
+    if(strcmp(str, "sym") == 0){
+        return 1;
+    }
+    if(strcmp(str, "ddg") == 0){
+        return 2;
+    }
+    if(strcmp(str, "norm") == 0){
+        return 3;
+    }
+    return 0;
+}
+
+
 
 int main(int argc, char *argv[]) {
     if(argc != 3){
         printf("An Error Has Occurred");
         return 1;
     }
-    if(strcmp(argv[1], "sym") == 0){
-        sym(argv[2]);
-    } else {
-        printf("An Error Has Occurred");
+    switch (classifyCalc(argv[1])){
+        case 1:
+            sym(argv[2]);
+            break;
+        case 2:
+            ddg(argv[2]);
+            break;
+        case 3:
+            norm(argv[2]);
+            break;
+        default:
+            printf("An Error Has Occurred");
+            break;
+
     }
     return 0;
 }
