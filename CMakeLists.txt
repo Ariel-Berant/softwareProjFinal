@@ -8,4 +8,5 @@ add_executable(softwareProjFinal
         symnmf.h
         matrixFuncs.c
         vectorFuncs.c
+        symnmfmodule.c
 )

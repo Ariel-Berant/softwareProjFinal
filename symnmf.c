@@ -87,15 +87,17 @@ void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices
 }
 
 mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
+    int i = 0, j, rows;
     vector *v = createVectors(file_name), *v1, *v2;/*create vectors from file*/
+    mat *m;
     if(v == NULL){
         return NULL;
     }
-    int i = 0, j, rows = getRows(file_name);
+    rows = getRows(file_name);
     v1 = v;
 
 
-    mat *m = initMatrix(rows, rows);/*creates a n*n matrix*/
+    m = initMatrix(rows, rows);/*creates a n*n matrix*/
     if(m == NULL){
         freeData(v);
         return NULL;
@@ -208,12 +210,12 @@ mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
         }
         currH = nextH;
         numer = multMat(w, currH);/*calculate numerator*/
+        denom = calcAbomination(currH);/*calculate abomination(aka denominator)*/
         if(numer == NULL){
             freeAll(numer, denom, currH, nextH);
             return NULL;
         }
 
-        denom = calcAbomination(currH);/*calculate abomination(aka denominator)*/
         if(denom == NULL){
             freeAll(numer, denom, currH, nextH);
             return NULL;

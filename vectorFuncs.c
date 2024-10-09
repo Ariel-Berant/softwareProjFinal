@@ -92,7 +92,7 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     int cols = getCols(file_name), rows = getRows(file_name);/*get rows and columns of vector matrix*/
     FILE *file = fopen(file_name, "r");
     vector *headVec = initVectors(cols, rows), *currVec = headVec;/*init empty vectors*/
-    cord *currCord;
+    cord *currCord = currVec->cords;/*init empty cords*/
     char c;
     double n;
 
@@ -104,7 +104,6 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     }
 
     while(fscanf(file,"%lf%c", &n, &c) == 2){/*reads cord and next char(line end or ,)*/
-        currCord = currVec->cords;
         currCord->value = n;
         if(c == ','){/*add cord if not at end of line*/
             currCord->value = n;
@@ -112,6 +111,9 @@ vector *createVectors(char *file_name){/*create vectors from file*/
         } else if(c == '\n'){/*add cord if at end of line*/
             currCord->value = n;
             currVec = currVec->next;
+            if(currVec != NULL){
+                currCord = currVec->cords;
+            }
         }
     }
 

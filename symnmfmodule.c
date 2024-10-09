@@ -36,7 +36,7 @@ static mat* pyToMatrix(PyObject *pyMatrix){/*turns python list of list to matrix
     }
 
     for(; i < rows; i++){
-        *row = PyList_GetItem(pyMatrix, i);/*get current row*/
+        row = PyList_GetItem(pyMatrix, i);/*get current row*/
         j = 0;/*restart to beginning of row*/
         for(; j < cols; j++){
             /*copy list of lists cell to matrix cell*/
