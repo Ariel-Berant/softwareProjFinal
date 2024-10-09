@@ -24,7 +24,30 @@ static PyObject* matrixToPy(mat *m){
     return pyList;
 }
 
-static PyObject* symCalcPy(PyObject *self, PyObject *args){
+static mat* pyToMatrix(PyObject *pyMatrix){/*turns python list of list to matrix*/
+    int rows = PyList_Size(pyMatrix);
+    int cols = PyList_Size(PyList_GetItem(pyMatrix, 0));/*gets row and column legths*/
+    int i = 0, j;
+    PyObject *row;
+
+    mat *m = initMatrix(rows, cols);
+    if(m == NULL){
+        return NULL;
+    }
+
+    for(; i < rows; i++){
+        *row = PyList_GetItem(pyMatrix, i);/*get current row*/
+        j = 0;/*restart to beginning of row*/
+        for(; j < cols; j++){
+            /*copy list of lists cell to matrix cell*/
+            m->data[i][j] = PyFloat_AsDouble(PyList_GetItem(row, j));
+        }
+    }
+
+    return m;
+}
+
+static PyObject* symCalcPy(PyObject *self, PyObject *args){/*python wrapper for sym*/
     char *file_name;
     if(!PyArg_ParseTuple(args, "s", &file_name)){/*parse desired file name*/
         PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
@@ -40,7 +63,7 @@ static PyObject* symCalcPy(PyObject *self, PyObject *args){
     return pyMatrix;
 }
 
-static PyObject* ddgCalcPy(PyObject *self, PyObject *args){
+static PyObject* ddgCalcPy(PyObject *self, PyObject *args){/*python wrapper for ddg*/
     char *file_name;
     if(!PyArg_ParseTuple(args, "s", &file_name)){/*parse desired file name*/
         PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
@@ -56,7 +79,7 @@ static PyObject* ddgCalcPy(PyObject *self, PyObject *args){
     return pyMatrix;
 }
 
-static PyObject* normCalcPy(PyObject *self, PyObject *args){
+static PyObject* normCalcPy(PyObject *self, PyObject *args){/*python wrapper for norm*/
     char *file_name;
     if(!PyArg_ParseTuple(args, "s", &file_name)){/*parse desired file name*/
         PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
@@ -69,6 +92,41 @@ static PyObject* normCalcPy(PyObject *self, PyObject *args){
     }
     PyObject *pyMatrix = matrixToPy(m);/*turn matrix into python matrix*/
     freeMatrix(m);
+    return pyMatrix;
+}
+
+static PyObject* symnmfCalcPy(){/*python wrapper for symnmf*/
+    PyObject *pyH, *pyW;
+    if(!PyArg_ParseTuple(args, "OO", &pyH, &pyW)){/*parse given matrices*/
+        PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
+        return NULL;
+    }
+
+    mat *h = pyToMatrix(pyH);/*try to initialize the matrices*/
+    mat *w = pyToMatrix(pyW);
+
+    if(h == NULL || w == NULL){
+        if(h != NULL){/*free either matrix if only one init failed*/
+            freeMatrix(h);
+        }
+        if(w != NULL){
+            freeMatrix(w);
+        }
+        PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
+        return NULL;
+    }
+
+    mat *m = symnmfCalc(h, w);/*calculate the matrix using function*/
+    if(m == NULL){/*in case of failure*/
+        freeMatrix(h);
+        freeMatrix(w);
+        PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
+        return NULL;
+    }
+    PyObject *pyMatrix = matrixToPy(m);/*turn matrix into python matrix*/
+    freeMatrix(m);
+    freeMatrix(h);
+    freeMatrix(w);
     return pyMatrix;
 }
 

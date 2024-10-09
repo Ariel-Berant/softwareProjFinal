@@ -6,6 +6,7 @@ import symnmf as symnmf_mod
 
 np.random.seed(1234)
 
+
 def get_vars():
     # get the variables from the command line
     try:
@@ -17,27 +18,42 @@ def get_vars():
     file_name = sys.argv[3]
     return k, calc_type, file_name
 
+
 def load_vects(file_name):
     # load the vectors from the file
     data = pd.read_csv(file_name, header=None)
     return data
 
-def sym(k, file_name):
+
+def print_matrix(lst):
+    # turn the list of lists into a string and print it
+    str_lst = [["%.4f" % elem for elem in row] for row in lst]
+    for row in str_lst:
+        print(",".join(row))
+
+
+def sym(file_name):
     # calculate the similarity matrix
-    symnmf_mod.sym(k, file_name)
-def ddg(k, file_name):
-    # calculate the degree matrix`
-    symnmf_mod.ddg(k, file_name)
-def norm(k, file_name):
+    print_matrix(symnmf_mod.sym(file_name))
+
+
+def ddg(file_name):
+    # calculate the degree matrix
+    print_matrix(symnmf_mod.ddg(file_name))
+
+
+def norm(file_name):
     # calculate the normalized matrix
-    symnmf_mod.norm(k, file_name)
+    print_matrix(symnmf_mod.norm(file_name))
+
+
 def symnmf(k, file_name):
     # calculate the symnmf
-    w = norm(k, file_name)
+    w = symnmf_mod.norm(file_name)
     m = np.mean(w)
     n = w.shape[0]
     h = np.random.uniform(0, 2*maths.sqrt(m/k), (n, k))
-    symnmf_mod.symnmf(h, w)
+    print_matrix(symnmf_mod.symnmf(h, w))
 
 
 def main():
@@ -46,11 +62,11 @@ def main():
 
     # perform the desired calculation
     if calc_type == "sym":
-        sym(k, file_name)
+        sym(file_name)
     elif calc_type == "ddg":
-        ddg(k, file_name)
+        ddg(file_name)
     elif calc_type == "norm":
-        norm(k, file_name)
+        norm(file_name)
     elif calc_type == "symnmf":
         symnmf(k, file_name)
     else:
