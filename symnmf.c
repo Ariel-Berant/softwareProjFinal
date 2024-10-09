@@ -92,7 +92,7 @@ mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
         return NULL;
     }
     int i = 0, j, rows = getRows(file_name);
-    v1 = v, v2 = v->next;
+    v1 = v;
 
 
     mat *m = initMatrix(rows, rows);/*creates a n*n matrix*/
@@ -102,6 +102,7 @@ mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
     }
 
     for(; i < rows; i++){
+        v2 = v1->next;
         for(j = i + 1; j < rows; j++){/*calculates top half and copies to bottom half*/
             if(i == j){
                 m->data[i][j] = 0;
@@ -112,7 +113,6 @@ mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
             v2 = v2->next;
         }
         v1 = v1->next;
-        v2 = v1->next;
     }
 
     freeData(v);

@@ -92,7 +92,7 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     int cols = getCols(file_name), rows = getRows(file_name);/*get rows and columns of vector matrix*/
     FILE *file = fopen(file_name, "r");
     vector *headVec = initVectors(cols, rows), *currVec = headVec;/*init empty vectors*/
-    cord *currCord = currVec->cords;
+    cord *currCord;
     char c;
     double n;
 
@@ -104,6 +104,7 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     }
 
     while(fscanf(file,"%lf%c", &n, &c) == 2){/*reads cord and next char(line end or ,)*/
+        currCord = currVec->cords;
         currCord->value = n;
         if(c == ','){/*add cord if not at end of line*/
             currCord->value = n;
@@ -111,10 +112,47 @@ vector *createVectors(char *file_name){/*create vectors from file*/
         } else if(c == '\n'){/*add cord if at end of line*/
             currCord->value = n;
             currVec = currVec->next;
-            currCord = currVec->cords;
         }
     }
 
     fclose(file);
     return headVec;
+}
+
+int getRows(char *file_name){/*get number of rows in file*/
+    FILE *file = fopen(file_name, "r");
+    int rows = 0;
+    char c;
+
+    if(file == NULL){
+        return -1;
+    }
+
+    while((c = fgetc(file)) != EOF){
+        if(c == '\n'){
+            rows++;
+        }
+    }
+
+    fclose(file);
+    return rows;
+}
+
+int getCols(char *file_name){/*get number of columns in file*/
+    FILE *file = fopen(file_name, "r");
+    int cols = 1;
+    char c;
+
+    if(file == NULL){
+        return -1;
+    }
+
+    while((c = fgetc(file)) != '\n'){
+        if(c == ','){
+            cols++;
+        }
+    }
+
+    fclose(file);
+    return cols;
 }

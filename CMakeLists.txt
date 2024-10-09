@@ -3,10 +3,9 @@ project(softwareProjFinal C)
 
 set(CMAKE_C_STANDARD 90)
 
-add_executable(softwareProjFinal main.c
+add_executable(softwareProjFinal
         symnmf.c
         symnmf.h
-        symnmfmodule.c
         matrixFuncs.c
         vectorFuncs.c
 )
