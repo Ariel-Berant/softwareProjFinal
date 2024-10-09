@@ -11,3 +11,6 @@ vectorFuncs.o: vectorFuncs.c symnmf.h
 
 matrixFuncs.o: matrixFuncs.c symnmf.h
 	gcc -g -c matrixFuncs.c $(CFLAGS)
+
+clean:
+	rm -f symnmf symnmf.o vectorFuncs.o matrixFuncs.o

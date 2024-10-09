@@ -30,6 +30,7 @@ def print_matrix(lst):
     str_lst = [["%.4f" % elem for elem in row] for row in lst]
     for row in str_lst:
         print(",".join(row))
+    print("")
 
 
 def sym(file_name):
@@ -51,9 +52,9 @@ def symnmf(k, file_name):
     # calculate the symnmf
     w = symnmf_mod.norm(file_name)
     m = np.mean(w)
-    n = w.shape[0]
+    n = len(w)
     h = np.random.uniform(0, 2*maths.sqrt(m/k), (n, k))
-    print_matrix(symnmf_mod.symnmf(h, w))
+    print_matrix(symnmf_mod.symnmf(h.tolist(), w))
 
 
 def main():
@@ -71,3 +72,6 @@ def main():
         symnmf(k, file_name)
     else:
         print("An Error Has Occurred")
+        
+if __name__ == "__main__":
+    main()
