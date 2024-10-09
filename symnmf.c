@@ -24,12 +24,12 @@ double calcFrobNormSq(mat *h, mat *nextH){/*calculate Frobenius norm of matrix*/
 }
 
 mat *calcAbomination(mat *m){/*calculate abomination of matrix(i.e (A*A^T)*A)*/
-    mat *first = multMat(m, calcTranspose(m));/*A*A^T*/
+    mat *first = multMat(m, calcTranspose(m)), *res;/*A*A^T*/
     if(first == NULL){
         return NULL;
     }
 
-    mat *res = multMat(first, m);/*(A*A^T)*A*/
+    res = multMat(first, m);/*(A*A^T)*A*/
     if(res == NULL){
         freeMatrix(first);
         return NULL;
@@ -87,15 +87,17 @@ void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices
 }
 
 mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
+    int i = 0, j, rows;
     vector *v = createVectors(file_name), *v1, *v2;/*create vectors from file*/
+    mat *m;
     if(v == NULL){
         return NULL;
     }
-    int i = 0, j, rows = getRows(file_name);
+    rows = getRows(file_name);
     v1 = v, v2 = v->next;
 
 
-    mat *m = initMatrix(rows, rows);/*creates a n*n matrix*/
+    m = initMatrix(rows, rows);/*creates a n*n matrix*/
     if(m == NULL){
         freeData(v);
         return NULL;
@@ -133,12 +135,12 @@ mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
     double sum;
 
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name);
+    mat *m = symCalc(file_name), *d;
     if(m == NULL){
         return NULL;
     }
 
-    mat *d = initMatrix(m->rows, m->cols);/*creates a n*n matrix*/
+    d = initMatrix(m->rows, m->cols);/*creates a n*n matrix*/
     if(d == NULL){
         return NULL;
     }
@@ -166,12 +168,12 @@ void ddg(char *file_name){/*ddg wrap*/
 
 mat *normCalc(char *file_name){/*turns A(n*n) to W(n*n)*/
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name);
+    mat *m = symCalc(file_name), *d;
     if(m == NULL){
         return NULL;
     }
     /*create D matrix from A*/
-    mat *d = ddgCalc(file_name);
+    d = ddgCalc(file_name);
     if(d == NULL){
         freeMatrix(m);
         return NULL;

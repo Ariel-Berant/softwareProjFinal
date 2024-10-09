@@ -1,6 +1,6 @@
-//
-// Created by ariel on 10/9/2024.
-//
+/*
+ Created by ariel on 10/9/2024.
+*/
 
 #include "symnmf.h"
 
