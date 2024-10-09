@@ -44,12 +44,12 @@ double euclideanDist(vector *vect1, vector *vect2);
 cord *initCords(int cols);
 vector *initVectors(int cols, int rows);
 vector *createVectors(char *file_name);
+int getRows(char *file_name);
+int getCols(char *file_name);
 
 /*matrix functions in matrixFuncs file*/
 mat *initMatrix(int rows, int cols);
 void freeMatrix(mat *m);
-int getRows(char *file_name);
-int getCols(char *file_name);
 void multDDGL(mat *reg, mat *diag);
 void multDDGR(mat *reg, mat *diag);
 mat *copyMat(mat *m);

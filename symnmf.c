@@ -125,6 +125,7 @@ void sym(char *file_name){/*sym wrap*/
     mat *m = symCalc(file_name);/*create A matrix from vectors*/
     if(m == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(m);
     freeMatrix(m);
@@ -161,6 +162,7 @@ void ddg(char *file_name){/*ddg wrap*/
     mat *d = ddgCalc(file_name);
     if(d == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(d);
     freeMatrix(d);
@@ -191,6 +193,7 @@ void norm(char *file_name){/*norm wrap*/
     mat *m = normCalc(file_name);
     if(m == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(m);
     freeMatrix(m);
