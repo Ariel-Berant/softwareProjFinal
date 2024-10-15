@@ -9,6 +9,7 @@ np.random.seed(1234)
 
 def get_vars():
     # get the variables from the command line
+    # does "No need to validate arguments" include checking the amount of args? thr type? etc
     try:
         k = int(sys.argv[1])
     except ValueError:
@@ -45,7 +46,7 @@ def ddg(file_name):
 
 def norm(file_name):
     # calculate the normalized matrix
-    print_matrix(symnmf_mod.norm(file_name))
+    return symnmf_mod.norm(file_name)
 
 
 def symnmf(k, file_name):
@@ -54,7 +55,7 @@ def symnmf(k, file_name):
     m = np.mean(w)
     n = w.shape[0]
     h = np.random.uniform(0, 2*maths.sqrt(m/k), (n, k))
-    print_matrix(symnmf_mod.symnmf(h, w))
+    return symnmf_mod.symnmf(h, w)
 
 
 def main():
@@ -67,8 +68,8 @@ def main():
     elif calc_type == "ddg":
         ddg(file_name)
     elif calc_type == "norm":
-        norm(file_name)
+        print_matrix(norm(file_name))
     elif calc_type == "symnmf":
-        symnmf(k, file_name)
+        print_matrix(symnmf(k, file_name))
     else:
         print("An Error Has Occurred")
