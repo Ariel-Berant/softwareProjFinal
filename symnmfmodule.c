@@ -95,7 +95,7 @@ static PyObject* normCalcPy(PyObject *self, PyObject *args){/*python wrapper for
     return pyMatrix;
 }
 
-static PyObject* symnmfCalcPy(){/*python wrapper for symnmf*/
+static PyObject* symnmfCalcPy(PyObject *self, PyObject *args){/*python wrapper for symnmf*/
     PyObject *pyH, *pyW;
     if(!PyArg_ParseTuple(args, "OO", &pyH, &pyW)){/*parse given matrices*/
         PyErr_SetString(PyExc_ValueError, "An Error Has Occurred");
