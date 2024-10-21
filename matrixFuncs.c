@@ -75,14 +75,10 @@ mat *copyMat(mat *m){/*copy matrix*/
 void printMatrix(mat *m){/*print matrix*/
     int i, j;
     for(i = 0; i < m->rows; i++){/*print every column of every row*/
-        for(j = 0; j < m->cols; j++){
-            if(j == m->cols - 1){
-                printf("%.4f\n", m->data[i][j]);/*print end of row*/
-            }
-            else{
-                printf("%.4f,", m->data[i][j]);
-            }
+        for(j = 0; j < m->cols - 1; j++){
+            printf("%.4f,", m->data[i][j]);
         }
+        printf("%.4f\n", m->data[i][j]);
     }
 }
 
