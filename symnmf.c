@@ -24,12 +24,12 @@ double calcFrobNormSq(mat *h, mat *nextH){/*calculate Frobenius norm of matrix*/
 }
 
 mat *calcAbomination(mat *m){/*calculate abomination of matrix(i.e (A*A^T)*A)*/
-    mat *first = multMat(m, calcTranspose(m));/*A*A^T*/
+    mat *first = multMat(m, calcTranspose(m)), *res;/*A*A^T*/
     if(first == NULL){
         return NULL;
     }
 
-    mat *res = multMat(first, m);/*(A*A^T)*A*/
+    res = multMat(first, m);/*(A*A^T)*A*/
     if(res == NULL){
         freeMatrix(first);
         return NULL;
@@ -125,6 +125,7 @@ void sym(char *file_name){/*sym wrap*/
     mat *m = symCalc(file_name);/*create A matrix from vectors*/
     if(m == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(m);
     freeMatrix(m);
@@ -135,12 +136,12 @@ mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
     double sum;
 
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name);
+    mat *m = symCalc(file_name), *d;
     if(m == NULL){
         return NULL;
     }
 
-    mat *d = initMatrix(m->rows, m->cols);/*creates a n*n matrix*/
+    d = initMatrix(m->rows, m->cols);/*creates a n*n matrix*/
     if(d == NULL){
         return NULL;
     }
@@ -161,6 +162,7 @@ void ddg(char *file_name){/*ddg wrap*/
     mat *d = ddgCalc(file_name);
     if(d == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(d);
     freeMatrix(d);
@@ -168,12 +170,12 @@ void ddg(char *file_name){/*ddg wrap*/
 
 mat *normCalc(char *file_name){/*turns A(n*n) to W(n*n)*/
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name);
+    mat *m = symCalc(file_name), *d;
     if(m == NULL){
         return NULL;
     }
     /*create D matrix from A*/
-    mat *d = ddgCalc(file_name);
+    d = ddgCalc(file_name);
     if(d == NULL){
         freeMatrix(m);
         return NULL;
@@ -191,6 +193,7 @@ void norm(char *file_name){/*norm wrap*/
     mat *m = normCalc(file_name);
     if(m == NULL){
         printf("An Error Has Occurred");
+        exit(1);
     }
     printMatrix(m);
     freeMatrix(m);
@@ -211,6 +214,7 @@ mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
         currH = nextH;
         numer = multMat(w, currH);/*calculate numerator*/
         denom = calcAbomination(currH);/*calculate abomination(aka denominator)*/
+
         if(numer == NULL){
             freeAll(numer, denom, currH, nextH);
             return NULL;

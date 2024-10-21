@@ -1,6 +1,6 @@
-//
-// Created by ariel on 10/9/2024.
-//
+/*
+ Created by ariel on 10/9/2024.
+*/
 
 #include "symnmf.h"
 
@@ -111,7 +111,7 @@ vector *createVectors(char *file_name){/*create vectors from file*/
         } else if(c == '\n'){/*add cord if at end of line*/
             currCord->value = n;
             currVec = currVec->next;
-            if(currVec != NULL){
+            if (currVec != NULL) {
                 currCord = currVec->cords;
             }
         }

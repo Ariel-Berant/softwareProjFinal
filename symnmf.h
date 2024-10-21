@@ -11,7 +11,7 @@
 #define EPSILON 1e-4
 #define MAX_ITER 300
 #define BETA 0.5
-#endif //SOFTWAREPROJFINAL_SYMNMF_H
+#endif /*SOFTWAREPROJFINAL_SYMNMF_H*/
 
 struct matrix
 {
