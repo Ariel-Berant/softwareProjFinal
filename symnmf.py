@@ -31,7 +31,6 @@ def print_matrix(lst):
     str_lst = [["%.4f" % elem for elem in row] for row in lst]
     for row in str_lst:
         print(",".join(row))
-    print("")
 
 
 def sym(file_name):
