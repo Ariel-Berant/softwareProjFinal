@@ -1,10 +1,12 @@
 import numpy as np
-# import pandas as pd
+import pandas as pd
 import math as maths
 import sys
 import symnmf as symnmf_mod
 from sklearn.metrics import silhouette_score
+from sklearn.datasets import make_blobs
 
+np.random.seed(1234)
 
 def get_vars():
     try:
@@ -14,6 +16,12 @@ def get_vars():
         sys.exit(1)
     file_name = sys.argv[2]
     return k, file_name
+
+
+def load_vects(file_name):
+    # load the vectors from the file
+    data = pd.read_csv(file_name, header=None)
+    return data
 
 
 def cluster_assignment(h):
@@ -120,6 +128,18 @@ def kmeans(k, input_data, iters):
     return centroids
 
 
+def find_closest_centroids(vectors, centroids):
+    #init empty list
+    labels = []
+    
+    # calculate distance to all centroids for every vector, and label is min distance
+    for i in range (len(vectors)):
+        centroids_dist = [euclidian_distance_calc(vectors[i], centroid) for centroid in centroids]
+        labels.append(centroids_dist.index(min(centroids_dist)))
+        
+    return labels
+
+
 def symnmf(k, file_name):
     # calculate the symnmf
     w = symnmf_mod.norm(file_name)
@@ -130,11 +150,20 @@ def symnmf(k, file_name):
 
 
 def main():
+    # get the variables and calc h and labels
     k, file_name = get_vars()
     h = symnmf(k, file_name)
     labels = cluster_assignment(h)
-    print("nmf: ", silhouette_score(h, labels))
-
+    data = load_vects(file_name)
+    
+    # calc and print silhouette score for symNMF
+    print("nmf: %.4f" % silhouette_score(data, labels))
+    
+    # calc labels for kmeans
+    labels = find_closest_centroids(data.values.tolist(), kmeans(k, file_name, 100))
+    
+    # calc and print silhouette score for kmeans
+    print("kmeans: %.4f" % silhouette_score(data, labels))
 
 if __name__ == "__main__":
     main()
