@@ -4,6 +4,15 @@
 
 #include "symnmf.h"
 
+int exists(char *file_name){/*check if file exists and/or opens*/
+    FILE *file = fopen(file_name, "r");/*try to open file*/
+    if(file == NULL){
+        return 0;
+    }
+    fclose(file);
+    return 1;
+}
+
 double symCellCalc(vector *v1, vector *v2){/*calculate cell in matrix using given formula*/
     double dist = euclideanDist(v1, v2), val;
     val = exp(-(pow(dist, 2)/2));
@@ -153,7 +162,7 @@ mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
         }
         d->data[i][i] = sum;/*sets diagonal cell to sum*/
     }
-
+    freeMatrix(m);
     return d;
 }
 
@@ -257,6 +266,12 @@ int main(int argc, char *argv[]) {
         printf("An Error Has Occurred");
         return 1;
     }
+    if (exists(argv[2]) == 0)
+    {
+        printf("An Error Has Occurred");
+        return 1;
+    }
+    
     switch (classifyCalc(argv[1])){
         case 1:
             sym(argv[2]);

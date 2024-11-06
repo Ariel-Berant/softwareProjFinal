@@ -43,7 +43,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": [],
+            "args": ["norm", "./Prev_final_100/test_input_small7.txt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

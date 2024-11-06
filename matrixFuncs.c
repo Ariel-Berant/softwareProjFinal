@@ -11,9 +11,15 @@ mat *initMatrix(int rows, int cols){/*create a 0 matrix*/
     mat *m = malloc(sizeof(mat));
 
     if(p == NULL || matrix == NULL || m == NULL){
-        free(p);
-        free(matrix);
-        free(m);
+        if (p != NULL) {
+            free(p);
+        }
+        if (matrix != NULL) {
+            free(matrix);
+        }
+        if (m != NULL) {
+            free(m);
+        }
         return NULL;
     }
 

@@ -17,6 +17,12 @@ def get_vars():
         sys.exit(1)
     calc_type = sys.argv[2]
     file_name = sys.argv[3]
+    try:
+        with open(file_name) as f:
+            pass
+    except FileNotFoundError:
+        print("An Error Has Occurred")
+        sys.exit(1)
     return k, calc_type, file_name
 
 

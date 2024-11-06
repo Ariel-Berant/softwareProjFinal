@@ -5,20 +5,28 @@
 #include "symnmf.h"
 
 void freeCords(cord *crd) {/*frees cords list*/
-    if (crd->next != NULL) {
-        freeCords(crd->next);
+    if (crd != NULL)
+    {
+        if (crd->next != NULL) {
+            freeCords(crd->next);
+        }
+        free(crd);
+        crd = NULL;
     }
-    free(crd);
-    crd = NULL;
 }
 
 void freeData(vector *vect) {/*frees vectors list*/
-    if (vect->next != NULL) {
-        freeData(vect->next);
+    if (vect != NULL){
+        if (vect->next != NULL) {
+            freeData(vect->next);
+        }
+        if (vect->cords != NULL)
+        {
+            freeCords(vect->cords);
+        }
+        free(vect);
+        vect = NULL;
     }
-    freeCords(vect->cords);
-    free(vect);
-    vect = NULL;
 }
 
 double euclideanDist(vector *vect1, vector *vect2) {/* calculates euclidean distance */
@@ -37,9 +45,9 @@ double euclideanDist(vector *vect1, vector *vect2) {/* calculates euclidean dist
 cord *initCords(int cols){/*create new cord list*/
     int i = 0;
     cord *head = malloc(sizeof(cord)), *curr = head;
+    curr->next = NULL;
 
     if(head == NULL){
-        free(head);
         return NULL;
     }
 
@@ -60,16 +68,21 @@ vector *initVectors(int cols, int rows){/*create new vector list*/
     int i = 0;
     vector *head = malloc(sizeof(vector)), *curr = head;
     cord *cordCurr;
+    curr->next = NULL;
 
     if(head == NULL){
-        free(head);
         return NULL;
     }
 
     for (; i < rows; ++i) {
         cordCurr = initCords(cols);/*init and check current cords*/
         if(cordCurr == NULL){
-            freeData(head);
+            if (head->cords != NULL) {
+                freeData(head);
+            }
+            else {
+                free(head);
+            }
             return NULL;
         }
         curr->cords = cordCurr;
@@ -97,7 +110,7 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     double n;
 
     if(file == NULL || headVec == NULL){/*checks proper init*/
-        if(headVec == NULL){
+        if(headVec != NULL){
             freeData(headVec);
         }
         return NULL;
@@ -106,10 +119,8 @@ vector *createVectors(char *file_name){/*create vectors from file*/
     while(fscanf(file,"%lf%c", &n, &c) == 2){/*reads cord and next char(line end or ,)*/
         currCord->value = n;
         if(c == ','){/*add cord if not at end of line*/
-            currCord->value = n;
             currCord = currCord->next;
         } else if(c == '\n'){/*add cord if at end of line*/
-            currCord->value = n;
             currVec = currVec->next;
             if (currVec != NULL) {
                 currCord = currVec->cords;

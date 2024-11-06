@@ -9,6 +9,12 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
+                "vectorFuncs.o", 
+                "matrixFuncs.o",
+                "-ansi", 
+                "-Wall", 
+                "-Wextra", 
+                "-pedantic-errors",
                 "-lm"
             ],
             "options": {
