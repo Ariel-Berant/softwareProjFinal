@@ -142,7 +142,7 @@ def find_closest_centroids(vectors, centroids):
 
 def symnmf(k, file_name):
     # calculate the symnmf
-    w = symnmf_mod.norm(file_name)
+    w = symnmf_mod.norm(load_vects(file_name).values.tolist())
     m = np.mean(w)
     n = len(w)
     h = np.random.uniform(0, 2*maths.sqrt(m/k), (n, k))

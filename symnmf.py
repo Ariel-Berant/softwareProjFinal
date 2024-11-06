@@ -1,10 +1,16 @@
 import numpy as np
-# import pandas as pd
+import pandas as pd
 import math as maths
 import sys
 import symnmf as symnmf_mod
 
 np.random.seed(1234)
+
+
+def init_vector_list(file_name):
+    # load the vectors from the file
+    data = pd.read_csv(file_name, header=None)
+    return data.values.tolist()
 
 
 def get_vars():
@@ -35,22 +41,22 @@ def print_matrix(lst):
 
 def sym(file_name):
     # calculate the similarity matrix
-    print_matrix(symnmf_mod.sym(file_name))
+    print_matrix(symnmf_mod.sym(init_vector_list(file_name)))
 
 
 def ddg(file_name):
     # calculate the degree matrix
-    print_matrix(symnmf_mod.ddg(file_name))
+    print_matrix(symnmf_mod.ddg(init_vector_list(file_name)))
 
 
 def norm(file_name):
     # calculate the normalized matrix
-    return symnmf_mod.norm(file_name)
+    return symnmf_mod.norm(init_vector_list(file_name))
 
 
 def symnmf(k, file_name):
     # calculate the symnmf
-    w = symnmf_mod.norm(file_name)
+    w = symnmf_mod.norm(init_vector_list(file_name))
     m = np.mean(w)
     n = len(w)
     h = np.random.uniform(0, 2*maths.sqrt(m/k), (n, k))

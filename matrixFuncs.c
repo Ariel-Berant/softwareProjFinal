@@ -42,6 +42,17 @@ void freeMatrix(mat *m){/*free matrix*/
     m = NULL;
 }
 
+double euclideanDist(mat *vectMat, int i, int j) {/* calculates euclidean distance */
+    double sum = 0;
+    int k;
+
+    for(k = 0; k < vectMat->cols; k++){
+        sum += pow((vectMat->data[i][k] - vectMat->data[j][k]), 2);/*sum of all cells squared*/
+    }
+
+    return sqrt(sum);
+}
+
 void multDDGL(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from left*/
     int i, j;
 

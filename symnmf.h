@@ -20,52 +20,61 @@ struct matrix
     int rows;
     int cols;
 };
-
-struct cord
-{
-    double value;
-    struct cord *next;
-};
-
-struct vector
-{
-    struct vector *next;
-    struct cord *cords;
-};
-
-typedef struct vector vector;
-typedef struct cord cord;
 typedef struct matrix mat;
 
 /*vector/cords functions in vectorFuncs*/
-void freeCords(cord *crd);
-void freeData(vector *vect);
-double euclideanDist(vector *vect1, vector *vect2);
-cord *initCords(int cols);
-vector *initVectors(int cols, int rows);
-vector *createVectors(char *file_name);
+
+/*check if file exists and/or opens*/
+int exists(char *file_name);
+/*calculate euclidean distance between two vectorsof same dimension*/
+double euclideanDist(mat *vectMat, int i, int j);
+/*get number of rows from file*/
 int getRows(char *file_name);
+/*get number of cols from file*/
 int getCols(char *file_name);
+/*turn file to matrix*/
+mat *fileToMatrix(char *file_name);
 
 /*matrix functions in matrixFuncs file*/
+
+/*initialize empty matrix m of dimensions rows x cols*/
 mat *initMatrix(int rows, int cols);
+/*free function for struct matrix*/
 void freeMatrix(mat *m);
+/*multiply matrix by diagonal matrix from left*/
 void multDDGL(mat *reg, mat *diag);
+/*multiply matrix by diagonal matrix from right*/
 void multDDGR(mat *reg, mat *diag);
+/*copy matrix m to new matrix*/
 mat *copyMat(mat *m);
+/*calculate transpose of matrix*/
 mat *calcTranspose(mat *m);
+/*multiply the rowth row of mat1 by colth column of mat2*/
 double multRowByCol(mat *mat1, mat *mat2, int row, int col);
+/*multiply matrices: mat1*mat2*/
 mat *multMat(mat *mat1, mat *mat2);
+/*print matrix*/
 void printMatrix(mat *m);
 
 /*symNMF algorithm related functions(directly, or function related)*/
+
+/*calculate Frobenius norm squared of two matrices*/
 double calcFrobNormSq(mat *h, mat *nextH);
-double symCellCalc(vector *v1, vector *v2);
-mat *symCalc(char *file_name);
-mat *ddgCalc(char *file_name);
-mat *normCalc(char *file_name);
+/*calculate a cell in the similarity matrix*/
+double symCellCalc(mat *vectMat, int i, int j);
+/*calculate and return similarity matrix from vectors*/
+mat *symCalc(mat *vectMat);
+/*calculate and return D matrix from A matrix*/
+mat *ddgCalc(mat *vectMat);
+/*calculate and return W matrix from A matrix*/
+mat *normCalc(mat *vectMat);
+/*calculate denominator(abomination of a matrix) for nextH calculation*/
 mat *calcAbomination(mat *m);
+/*calculate matrix for the next iteration*/
 mat *calcNextIter(mat *numerator, mat *denominator, mat *h);
+/*check if H has converged or iteration limit has been reached*/
 int checkFinish(mat *h, mat *nextH, int currIter);
+/*free all matrices in symnmf calculation*/
 void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH);
+/*calculate symnmf matrix*/
 mat *symnmfCalc(mat *h, mat *w);

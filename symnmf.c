@@ -4,17 +4,8 @@
 
 #include "symnmf.h"
 
-int exists(char *file_name){/*check if file exists and/or opens*/
-    FILE *file = fopen(file_name, "r");/*try to open file*/
-    if(file == NULL){
-        return 0;
-    }
-    fclose(file);
-    return 1;
-}
-
-double symCellCalc(vector *v1, vector *v2){/*calculate cell in matrix using given formula*/
-    double dist = euclideanDist(v1, v2), val;
+double symCellCalc(mat *vectMat, int i, int j){/*calculate cell in matrix using given formula*/
+    double dist = euclideanDist(vectMat, i, j), val;
     val = exp(-(pow(dist, 2)/2));
     return val;
 }
@@ -95,57 +86,50 @@ void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices
     }
 }
 
-mat *symCalc(char *file_name){/*turn vector mat(n*m) to A(n*n)*/
-    int i = 0, j, rows;
-    vector *v = createVectors(file_name), *v1, *v2;/*create vectors from file*/
+mat *symCalc(mat *vectMat){/*turn vector mat(n*m) to A(n*n)*/
+    int i = 0, j, rows = vectMat->rows;
     mat *m;
-    if(v == NULL){
-        return NULL;
-    }
-    rows = getRows(file_name);
-    v1 = v;
-
 
     m = initMatrix(rows, rows);/*creates a n*n matrix*/
     if(m == NULL){
-        freeData(v);
         return NULL;
     }
 
     for(; i < rows; i++){
-        v2 = v1->next;
         for(j = i + 1; j < rows; j++){/*calculates top half and copies to bottom half*/
-            if(i == j){
-                m->data[i][j] = 0;
-            } else {
-                m->data[i][j] = symCellCalc(v1, v2);
-                m->data[j][i] = m->data[i][j];
-            }
-            v2 = v2->next;
+            m->data[i][j] = symCellCalc(vectMat, i, j);
+            m->data[j][i] = m->data[i][j];
         }
-        v1 = v1->next;
     }
 
-    freeData(v);
     return m;
 }
 
 void sym(char *file_name){/*sym wrap*/
-    mat *m = symCalc(file_name);/*create A matrix from vectors*/
+    mat *m = fileToMatrix(file_name), *s;/*create A matrix from vectors*/
     if(m == NULL){
         printf("An Error Has Occurred");
         exit(1);
     }
-    printMatrix(m);
+    s = symCalc(m);/*create sym matrix from A matrix*/
+    if (s == NULL)
+    {
+        printf("An Error Has Occurred\n");
+        freeMatrix(m);
+        exit(1);
+    }
+    
+    printMatrix(s);
     freeMatrix(m);
+    freeMatrix(s);
 }
 
-mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
+mat *ddgCalc(mat *vectMat){/*turns A(n*n) to D(n*n)*/
     int i, j;
     double sum;
 
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name), *d;
+    mat *m = symCalc(vectMat), *d;
     if(m == NULL){
         return NULL;
     }
@@ -168,23 +152,32 @@ mat *ddgCalc(char *file_name){/*turns A(n*n) to D(n*n)*/
 
 void ddg(char *file_name){/*ddg wrap*/
     /*create D matrix from A matrix*/
-    mat *d = ddgCalc(file_name);
-    if(d == NULL){
-        printf("An Error Has Occurred");
+    mat *m = fileToMatrix(file_name), *d;
+    if(m == NULL){
+        printf("An Error Has Occurred\n");
         exit(1);
     }
+    d = ddgCalc(m);
+    if (d == NULL)
+    {
+        printf("An Error Has Occurred\n");
+        freeMatrix(m);
+        exit(1);
+    }
+    
     printMatrix(d);
     freeMatrix(d);
+    freeMatrix(m);
 }
 
-mat *normCalc(char *file_name){/*turns A(n*n) to W(n*n)*/
+mat *normCalc(mat *vectMat){/*turns A(n*n) to W(n*n)*/
     /*create A matrix from vectors*/
-    mat *m = symCalc(file_name), *d;
+    mat *m = symCalc(vectMat), *d;
     if(m == NULL){
         return NULL;
     }
     /*create D matrix from A*/
-    d = ddgCalc(file_name);
+    d = ddgCalc(vectMat);
     if(d == NULL){
         freeMatrix(m);
         return NULL;
@@ -197,15 +190,23 @@ mat *normCalc(char *file_name){/*turns A(n*n) to W(n*n)*/
     return m;
 }
 
-void norm(char *file_name){/*norm wrap*/
+void norm(char *file_name){/*norm wrapper function*/
     /*create W matrix from A matrix*/
-    mat *m = normCalc(file_name);
+    mat *m = fileToMatrix(file_name), *n;
     if(m == NULL){
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         exit(1);
     }
-    printMatrix(m);
+    n = normCalc(m);
+    if (n == NULL)
+    {
+        printf("An Error Has Occurred\n");
+        freeMatrix(m);
+        exit(1);
+    }
+    printMatrix(n);
     freeMatrix(m);
+    freeMatrix(n);
 }
 
 mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
@@ -263,12 +264,12 @@ int classifyCalc(char* str){
 
 int main(int argc, char *argv[]) {
     if(argc != 3){
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         return 1;
     }
     if (exists(argv[2]) == 0)
     {
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         return 1;
     }
     
@@ -283,7 +284,7 @@ int main(int argc, char *argv[]) {
             norm(argv[2]);
             break;
         default:
-            printf("An Error Has Occurred");
+            printf("An Error Has Occurred\n");
             break;
 
     }

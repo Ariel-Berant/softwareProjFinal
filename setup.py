@@ -1,6 +1,6 @@
 from setuptools import Extension, setup
 
-module = Extension("symnmf", sources=['symnmf.c','symnmfmodule.c', 'vectorFuncs.c', 'matrixFuncs.c'])
+module = Extension("symnmf", sources=['symnmf.c','symnmfmodule.c', 'fileFuncs.c', 'matrixFuncs.c'])
 
 setup(name='symnmf',
       version='1.0',
