@@ -150,24 +150,20 @@ def symnmf(k, file_name):
 
 
 def main():
-    try:
-        # get the variables and calc h and labels
-        k, file_name = get_vars()
-        h = symnmf(k, file_name)
-        labels = cluster_assignment(h)
-        data = load_vects(file_name)
-        
-        # calc and print silhouette score for symNMF
-        print("nmf: %.4f" % silhouette_score(data, labels))
-        
-        # calc labels for kmeans
-        labels = find_closest_centroids(data.values.tolist(), kmeans(k, file_name, 100))
-        
-        # calc and print silhouette score for kmeans
-        print("kmeans: %.4f" % silhouette_score(data, labels))
-    except:
-        print("An Error Has Occurred")
-        sys.exit(1)
+    # get the variables and calc h and labels
+    k, file_name = get_vars()
+    h = symnmf(k, file_name)
+    labels = cluster_assignment(h)
+    data = load_vects(file_name)
+    
+    # calc and print silhouette score for symNMF
+    print("nmf: %.4f" % silhouette_score(data, labels))
+    
+    # calc labels for kmeans
+    labels = find_closest_centroids(data.values.tolist(), kmeans(k, file_name, 100))
+    
+    # calc and print silhouette score for kmeans
+    print("kmeans: %.4f" % silhouette_score(data, labels))
 
 if __name__ == "__main__":
     main()
