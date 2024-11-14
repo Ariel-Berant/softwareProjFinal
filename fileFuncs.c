@@ -4,7 +4,12 @@
 
 #include "symnmf.h"
 
-int exists(char *file_name){/*check if file exists and/or opens*/
+/*
+ * Check if file exists and/or opens.
+ * @param file_name a character pointer to the name of the file
+ * @return 1 if file exists and can be opened, 0 otherwise
+ * */
+int exists(char *file_name){
     FILE *file = fopen(file_name, "r");/*try to open file*/
     if(file == NULL){
         return 0;
@@ -13,7 +18,12 @@ int exists(char *file_name){/*check if file exists and/or opens*/
     return 1;
 }
 
-int getRows(char *file_name){/*get number of rows in file*/
+/*
+ * Get number of rows in file of input vectors.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return rows number of rows N (i.e. the number of input vectors)
+ * */
+int getRows(char *file_name){
     FILE *file = fopen(file_name, "r");
     int rows = 0;
     char c;
@@ -32,7 +42,12 @@ int getRows(char *file_name){/*get number of rows in file*/
     return rows;
 }
 
-int getCols(char *file_name){/*get number of columns in file*/
+/*
+ * Get number of columns in file of input vectors.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return rows number of columns d (i.e. the dimension of each vector)
+ * */
+int getCols(char *file_name){
     FILE *file = fopen(file_name, "r");
     int cols = 1;
     char c;
@@ -51,7 +66,12 @@ int getCols(char *file_name){/*get number of columns in file*/
     return cols;
 }
 
-mat *fileToMatrix(char *file_name){/*turn file to matrix*/
+/*
+ * Turn file of input vectors into a matrix.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return m pointer to a matrix with entries from the data, NULL if unsuccessful
+ * */
+mat *fileToMatrix(char *file_name){
     /*get rows and columns of vector matrix, and init variables*/
     int rows = getRows(file_name), cols = getCols(file_name), i, j;
     double n;

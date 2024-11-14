@@ -4,13 +4,25 @@
 
 #include "symnmf.h"
 
-double symCellCalc(mat *vectMat, int i, int j){/*calculate cell in matrix using given formula*/
+/*
+ * Calculate cell in matrix using given formula.
+ * @param vecMat a pointer to a matrix of vectors
+ * @param i int the row num of the 1st vector
+ * @param j in the row num of the 2nd vector
+ * */
+double symCellCalc(mat *vectMat, int i, int j){
     double dist = euclideanDist(vectMat, i, j), val;
     val = exp(-(pow(dist, 2)/2));
     return val;
 }
 
-double calcFrobNormSq(mat *h, mat *nextH){/*calculate Frobenius norm of matrix*/
+/*
+ * Calculate the Frobenius norm of a matrix.
+ * @param h a pointer to the matrix of this iteration
+ * @param nextH a pointer to the matrix of this iteration
+ * @return sum the Forbenius norm squared
+ * */
+double calcFrobNormSq(mat *h, mat *nextH){
     int i, j;
     double sum = 0;
 
@@ -23,7 +35,12 @@ double calcFrobNormSq(mat *h, mat *nextH){/*calculate Frobenius norm of matrix*/
     return sum;
 }
 
-mat *calcAbomination(mat *m){/*calculate abomination of matrix(i.e (A*A^T)*A)*/
+/*
+ * Calculate abomination of matrix (i.e (A*A^T)*A).
+ * @param m a pointer to a matrix
+ * @return res a pointer to the resulting matrix
+ * */
+mat *calcAbomination(mat *m){
     mat *first = multMat(m, calcTranspose(m)), *res;/*A*A^T*/
     if(first == NULL){
         return NULL;
@@ -38,7 +55,14 @@ mat *calcAbomination(mat *m){/*calculate abomination of matrix(i.e (A*A^T)*A)*/
     return res;
 }
 
-mat *calcNextIter(mat *numerator, mat *denominator, mat *h) {/*calculate next iteration of H*/
+/*
+ * Calculate next iteration of H according to the SymNMF algorithm.
+ * @param numerator a matrix pointer to the numerator calculated according to the SymNMF algorithm
+ * @param denominator a matrix pointer to the numerator calculated according to the SymNMF algorithm
+ * @param h a matrix pointer to the current matrix H
+ * @return nextH a pointer to the matrix of the next iteration
+ * */
+mat *calcNextIter(mat *numerator, mat *denominator, mat *h) {
     int i, j;
     double res;
 
@@ -59,7 +83,14 @@ mat *calcNextIter(mat *numerator, mat *denominator, mat *h) {/*calculate next it
     return nextH;
 }
 
-int checkFinish(mat *h, mat *nextH, int currIter){/*check if H has converged*/
+/*
+ * Check if H has converged.
+ * @param h a matrix pointer to the matrix of the current iteration
+ * @param nextH a matrix pointer to the matrix of the next iteration
+ * @param currIter an int - the iteration number
+ * @return 0 if converged, 1 if not converged
+ * */
+int checkFinish(mat *h, mat *nextH, int currIter){
 
     if(calcFrobNormSq(h, nextH) < EPSILON){/*if Frobenius norm is less than EPSILON, converged*/
         return 1;
@@ -71,7 +102,15 @@ int checkFinish(mat *h, mat *nextH, int currIter){/*check if H has converged*/
     return 0;
 }
 
-void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices in symnmf calculation*/
+/*
+ * Free all matrices in SymNMF calculation.
+ * @param numerator a matrix pointer to the numerator calculated according to the SymNMF algorithm
+ * @param denominator a matrix pointer to the numerator calculated according to the SymNMF algorithm
+ * @param h a matrix pointer to the matrix of the current iteration
+ * @param nextH a matrix pointer to the matrix of the next iteration
+ * @return void
+ * */
+void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){
     if(numer != NULL){
         freeMatrix(numer);
     }
@@ -86,7 +125,12 @@ void freeAll(mat *numer, mat *denom, mat *currH, mat *nextH){/*free all matrices
     }
 }
 
-mat *symCalc(mat *vectMat){/*turn vector mat(n*m) to A(n*n)*/
+/*
+ * Calculate the similarity matrix of a given set of vectors (in matrix form).
+ * @param vectMat a matrix of vectors (size: N*d)
+ * @return m the similarity matrix A  of the input vectors (size:N*N)
+ * */
+mat *symCalc(mat *vectMat){
     int i = 0, j, rows = vectMat->rows;
     mat *m;
 
@@ -105,10 +149,15 @@ mat *symCalc(mat *vectMat){/*turn vector mat(n*m) to A(n*n)*/
     return m;
 }
 
-void sym(char *file_name){/*sym wrap*/
+/*
+ * A wrapper function for symCalc.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return void
+ * */
+void sym(char *file_name){
     mat *m = fileToMatrix(file_name), *s;/*create A matrix from vectors*/
     if(m == NULL){
-        printf("An Error Has Occurred");
+        printf("An Error Has Occurred\n");
         exit(1);
     }
     s = symCalc(m);/*create sym matrix from A matrix*/
@@ -124,7 +173,11 @@ void sym(char *file_name){/*sym wrap*/
     freeMatrix(s);
 }
 
-mat *ddgCalc(mat *vectMat){/*turns A(n*n) to D(n*n)*/
+/* Calculate the diagonal degree matrix of a given set of vectors (in matrix form).
+ * @param vectMat a pointer to the matrix of input vectors (size: N*d)
+ * @return d the diagonal degree matrix D of the input vectors (size:N*N)
+ * */
+mat *ddgCalc(mat *vectMat){
     int i, j;
     double sum;
 
@@ -150,7 +203,12 @@ mat *ddgCalc(mat *vectMat){/*turns A(n*n) to D(n*n)*/
     return d;
 }
 
-void ddg(char *file_name){/*ddg wrap*/
+/*
+ * A wrapper function for ddgCalc.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return void
+ * */
+void ddg(char *file_name){
     /*create D matrix from A matrix*/
     mat *m = fileToMatrix(file_name), *d;
     if(m == NULL){
@@ -170,7 +228,11 @@ void ddg(char *file_name){/*ddg wrap*/
     freeMatrix(m);
 }
 
-mat *normCalc(mat *vectMat){/*turns A(n*n) to W(n*n)*/
+/* Calculate the normalized similarity matrix of a given set of vectors (in matrix form).
+ * @param vectMat a pointer to the matrix of input vectors (size: N*d)
+ * @return m the normalized similarity matrix W of the input vectors (size:N*N)
+ * */
+mat *normCalc(mat *vectMat){
     /*create A matrix from vectors*/
     mat *m = symCalc(vectMat), *d;
     if(m == NULL){
@@ -190,7 +252,12 @@ mat *normCalc(mat *vectMat){/*turns A(n*n) to W(n*n)*/
     return m;
 }
 
-void norm(char *file_name){/*norm wrapper function*/
+/*
+ * A wrapper function for normCalc.
+ * @param file_name a character pointer to the name of the file that contains the input vectors
+ * @return void
+ * */
+void norm(char *file_name){
     /*create W matrix from A matrix*/
     mat *m = fileToMatrix(file_name), *n;
     if(m == NULL){
@@ -209,7 +276,13 @@ void norm(char *file_name){/*norm wrapper function*/
     freeMatrix(n);
 }
 
-mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
+/*
+ * Perform the calculations of the symmetric Non-negative Matrix Factorization algorithm.
+ * @param h a matrix pointer to the matrix of the current iteration (size: N*k)
+ * @param w a matrix pointer to the normalized similarity matrix W (size:N*N)
+ * @return nextH a matrix pointer to the matrix of the next iteration (size: N*k)
+ * */
+mat *symnmfCalc(mat *h, mat *w){
     int iter = 0;
     mat *numer, *denom, *currH, *nextH;
     nextH = copyMat(h);/*copy H matrix*/
@@ -225,12 +298,7 @@ mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
         numer = multMat(w, currH);/*calculate numerator*/
         denom = calcAbomination(currH);/*calculate abomination(aka denominator)*/
 
-        if(numer == NULL){
-            freeAll(numer, denom, currH, nextH);
-            return NULL;
-        }
-
-        if(denom == NULL){
+        if(numer == NULL || denom == NULL){
             freeAll(numer, denom, currH, nextH);
             return NULL;
         }
@@ -249,6 +317,11 @@ mat *symnmfCalc(mat *h, mat *w){/*calculate symnmf matrix*/
     return nextH;
 }
 
+/*
+ * Classify calculation type.
+ * @param str a character pointer to the calculation type
+ * @return 1 if str = "sym", 2 if "ddg" = 2, 3 if str = "norm", 0 otherwise
+ * */
 int classifyCalc(char* str){
     if(strcmp(str, "sym") == 0){
         return 1;
@@ -262,6 +335,9 @@ int classifyCalc(char* str){
     return 0;
 }
 
+/*
+ * Prints matrix according to the desired goal.
+ * */
 int main(int argc, char *argv[]) {
     if(argc != 3){
         printf("An Error Has Occurred\n");

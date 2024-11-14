@@ -4,7 +4,13 @@
 
 #include "symnmf.h"
 
-mat *initMatrix(int rows, int cols){/*create a 0 matrix*/
+/*
+ * Initialize a zero matrix.
+ * @param rows int number of rows of the matrix
+ * @param cols int number of columns of the matrix
+ * @return a pointer to a zero matrix with the desired number of rows and columns
+ * */
+mat *initMatrix(int rows, int cols){
     int i = 0;
     double *p = calloc(rows*cols, sizeof(double));
     double **matrix = calloc(rows, sizeof(double*));
@@ -35,14 +41,26 @@ mat *initMatrix(int rows, int cols){/*create a 0 matrix*/
     return m;
 }
 
-void freeMatrix(mat *m){/*free matrix*/
+/*
+ * Free matrix.
+ * @param m pointer to a matrix
+ * @return void
+ * */
+void freeMatrix(mat *m){
     free(m->whole);
     free(m->data);
     free(m);
     m = NULL;
 }
 
-double euclideanDist(mat *vectMat, int i, int j) {/* calculates euclidean distance */
+/*
+ * Calculate Euclidean distance of two vectors(rows) in a matrix.
+ * @param vectMat pointer to a matrix of vectors
+ * @param i int the row num of the 1st vector
+ * @param j in the row num of the 2nd vector
+ * @return the Euclidean distance between the ith and jth row
+ * */
+double euclideanDist(mat *vectMat, int i, int j) {
     double sum = 0;
     int k;
 
@@ -53,7 +71,13 @@ double euclideanDist(mat *vectMat, int i, int j) {/* calculates euclidean distan
     return sqrt(sum);
 }
 
-void multDDGL(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from left*/
+/*
+ * Multiply a matrix by a diagonal matrix from the left.
+ * @param reg a matrix pointer to a regular matrix
+ * @param diag a matrix pointer to a diagonal matrix
+ * @return void
+ * */
+void multDDGL(mat *reg, mat *diag){
     int i, j;
 
     for (i = 0; i < reg->rows; i++) {
@@ -63,7 +87,13 @@ void multDDGL(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from lef
     }
 }
 
-void multDDGR(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from right*/
+/*
+ * Multiply a matrix by a diagonal matrix from the right.
+ * @param reg a matrix pointer to a regular matrix
+ * @param diag a matrix pointer to a diagonal matrix
+ * @return void
+ * */
+void multDDGR(mat *reg, mat *diag){
     int i, j;
 
     for (i = 0; i < reg->cols; i++) {
@@ -73,7 +103,12 @@ void multDDGR(mat *reg, mat *diag){/*multiply matrix by diagonal matrix from rig
     }
 }
 
-mat *copyMat(mat *m){/*copy matrix*/
+/*
+ * Copy a matrix.
+ * @param m a matrix pointer to a matrix
+ * @return res a matrix pointer to the copy of m
+ * */
+mat *copyMat(mat *m){
     int i, j;
     mat *res = initMatrix(m->rows, m->cols);
     if(res == NULL){
@@ -89,7 +124,12 @@ mat *copyMat(mat *m){/*copy matrix*/
     return res;
 }
 
-void printMatrix(mat *m){/*print matrix*/
+/*
+ * Print a matrix.
+ * @param m a matrix pointer to a matrix
+ * @return void
+ * */
+void printMatrix(mat *m){
     int i, j;
     for(i = 0; i < m->rows; i++){/*print every column of every row*/
         for(j = 0; j < m->cols - 1; j++){
@@ -99,7 +139,13 @@ void printMatrix(mat *m){/*print matrix*/
     }
 }
 
-mat *multMat(mat *mat1, mat *mat2){/*multiply matrices: mat1*mat2*/
+/*
+ * Multiply two matrices.
+ * @param mat1 a matrix pointer to the first matrix
+ * @param mat2 a matrix pointer to the second matrix
+ * @return res a matrix pointer to the result of the multiplication
+ * */
+mat *multMat(mat *mat1, mat *mat2){
     int i, j;
     mat *res = initMatrix(mat1->rows, mat2->cols);/*init result matrix*/
     if(res == NULL){
@@ -115,7 +161,12 @@ mat *multMat(mat *mat1, mat *mat2){/*multiply matrices: mat1*mat2*/
     return res;
 }
 
-mat *calcTranspose(mat *m){/*calculate transpose of matrix*/
+/*
+ * Calculate the transpose of a matrix.
+ * @param m pointer to a matrix
+ * @return res pointer to the transposed matrix
+ * */
+mat *calcTranspose(mat *m){
     int i, j;
     mat *res = initMatrix(m->cols, m->rows);
     if(res == NULL){
@@ -131,7 +182,15 @@ mat *calcTranspose(mat *m){/*calculate transpose of matrix*/
     return res;
 }
 
-double multRowByCol(mat *mat1, mat *mat2, int row, int col){/*multiplies fow in mat1 by column in mat2*/
+/*
+ * Multiply a row in mat1 by a column in mat2
+ * @param mat1 a matrix pointer to the first matrix
+ * @param mat2 a matrix pointer to the second matrix
+ * @param row an int row number
+ * @param col an int column number
+ * @return res an int the result of the calculation
+ * */
+double multRowByCol(mat *mat1, mat *mat2, int row, int col){
     double res = 0;
     int i;
 
