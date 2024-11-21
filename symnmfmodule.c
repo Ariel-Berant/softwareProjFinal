@@ -181,13 +181,13 @@ static PyMethodDef symnmfMethods[] = {
 
 static struct PyModuleDef symnmfmodule = {
     PyModuleDef_HEAD_INIT,
-    "symnmf",
+    "symnmf_c",
     "A module that calculates the sym, ddg ,norm and symnmf matrices",
     -1,
     symnmfMethods
 };
 
-PyMODINIT_FUNC PyInit_symnmf(void){
+PyMODINIT_FUNC PyInit_symnmf_c(void){
     PyObject *m;
     m = PyModule_Create(&symnmfmodule);
     if(!m){

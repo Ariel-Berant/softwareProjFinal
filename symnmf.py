@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import math as maths
 import sys
-import symnmf as symnmf_mod
+import symnmf_c as symnmf_mod
 
 np.random.seed(1234)
 

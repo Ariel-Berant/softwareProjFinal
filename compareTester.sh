@@ -217,8 +217,8 @@ run_valgrind_c_test() {
     fi
 }
 # Ensure dependencies are installed
-install_dependencies
-install_valgrind
+# install_dependencies
+# install_valgrind
 
 # Compile the symnmf.py files
 echo -e "${BLUE}Compiling current symnmf.py...${NC}"

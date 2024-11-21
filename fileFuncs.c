@@ -94,7 +94,11 @@ mat *fileToMatrix(char *file_name){
     {
         for (j = 0; j < cols; j++)
         {
-            fscanf(file,"%lf%c", &n, &c);/*read number and next char*/
+            if(fscanf(file,"%lf%c", &n, &c) == -1){/*read number and next char*/
+                freeMatrix(m);
+                fclose(file);
+                return NULL;
+            }
             m->data[i][j] = n;
         }
     }

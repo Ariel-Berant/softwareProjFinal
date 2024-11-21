@@ -103,20 +103,14 @@ def kmeans(k, input_data, iters):
     :return: centroids that result from running the kmeans algorithm on the input data
     :rtype: list of (list of float)
     """
-    # get vectors from file
     input_vectors = get_vects_from_file(input_data)
-
-    # initialize variables
     centroids = input_vectors[:k]
     epsilon = 0.001
-
-    # initialize centroids
     for i in range(k):
         centroids.append(input_vectors[i])
 
     for i in range(iters):
         cluster_list = [[] for i in range(k)]
-
         for vect in input_vectors:
             # calculate distance to all centroids
             centroids_dist = [euclidian_distance_calc(vect, centroid) for centroid in centroids]
