@@ -1,8 +1,10 @@
 # Software Project course semester b, 2024
 ## Contact us
-Ariel Berant    Hila Perry
+Ariel Berant <br>
 <a href="https://github.com/Ariel-Berant">
-  <img height=50, width=50 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" />
+  <img height=50, width=50 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" /> <br>
+
+Hila Perry <br>
 <a href="https://github.com/HilaPerry">
   <img height=50, width=50 src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg" />
 ## Description
